@@ -37,7 +37,7 @@ public class BusStopContractTests {
         assertEquals("Cannot find inner class to complete unit test", 1, innerClasses.length);
         Class entryClass = innerClasses[0];
         Field[] allFields = entryClass.getDeclaredFields();
-        assertEquals("There should be exactly 12 String members in the inner class", 12, allFields.length);
+        assertEquals("There should be exactly 13 String members in the inner class", 13, allFields.length);
         for (Field field : allFields) {
             assertTrue("All members in the contract class should be Strings", field.getType()==String.class);
             assertTrue("All members in the contract class should be final", Modifier.isFinal(field.getModifiers()));

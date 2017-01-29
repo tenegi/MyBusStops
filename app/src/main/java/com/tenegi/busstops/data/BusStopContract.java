@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Created by lyndon on 29/01/2017. 
+ * Created by lyndon on 29/01/2017.
  */
 
 public class BusStopContract {
