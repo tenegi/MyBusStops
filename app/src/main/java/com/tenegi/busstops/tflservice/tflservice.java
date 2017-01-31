@@ -2,6 +2,8 @@ package com.tenegi.busstops.tflService;
 
 import android.app.Activity;
 import android.app.IntentService;
+import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
+import com.tenegi.busstops.data.BusStopContentProvider;
 import com.tenegi.busstops.data.BusStopContract;
 
 import java.io.BufferedReader;
@@ -20,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
@@ -80,7 +84,7 @@ public class tflService extends IntentService {
             }
         }
         Log.d(TAG, "File downloaded");
-        updateDatabase(output.getAbsolutePath());
+        updateDatabaseBatch(output.getAbsolutePath());
         publishResults(output.getAbsolutePath(), result);
     }
     private void publishResults(String outputPath, int result){
@@ -123,6 +127,57 @@ public class tflService extends IntentService {
 
         } catch(IOException e){
         e.printStackTrace();
+        }
+    }
+    private void updateDatabaseBatch(String outputPath){
+        try {
+            FileReader file = new FileReader(outputPath);
+            BufferedReader buffer = new BufferedReader(file);
+            String line = "";
+            int linesRead =0;
+            final int batchSize =1000;
+            int thisBatch = 0;
+            int insertCount = 0;
+            //ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+            ContentResolver contentResolver = this.getContentResolver();
+            ContentValues[] linesToInsert = new ContentValues[batchSize];
+            line = buffer.readLine(); // skip line with header titles
+            while((line = buffer.readLine()) != null){
+
+                linesRead++;
+                //thisBatch ++;
+                ContentValues busStopValues = new ContentValues();
+                String[] str = line.split(",");
+                if(str.length == 11) {
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_ROUTE, str[0]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_RUN, str[1]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_SEQUENCE, str[2]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_CODE_LBSL, str[3]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE, str[4]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO, str[5]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_NAME, str[6]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, str[7]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, str[8]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, str[9]);
+                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 0);
+                    //Uri uri = contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, busStopValues);
+                    //thisBatch ++;
+                    linesToInsert[thisBatch++] = busStopValues;
+                } else {
+                    Log.d(TAG, "skipping malformed line " + line);
+                }
+                //linesToInsert[thisBatch++] = busStopValues;
+                if(thisBatch == batchSize){
+                    Log.d(TAG, "Inserting batch of " + linesToInsert.length + "lines Read = " + linesRead);
+                    insertCount = contentResolver.bulkInsert(BusStopContract.BusStopEntry.CONTENT_URI, linesToInsert);
+                    thisBatch = 0;
+                    linesToInsert = new ContentValues[batchSize];
+                    Log.d(TAG, "batch inserted " + insertCount);
+                }
+            }
+
+        } catch(IOException e){
+            e.printStackTrace();
         }
     }
 
