@@ -14,7 +14,7 @@ public class BusStopContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
     public static final String PATH_BUSSTOPS = "busstops";
     public static final String PATH_BUSROUTES = "busstops/routes";
-    public static final String PATH_FAVOURITES = "busstops/favourites";
+    public static final String PATH_FAVOURITES = "favourites";
 
     public static final class BusStopEntry implements BaseColumns {
 

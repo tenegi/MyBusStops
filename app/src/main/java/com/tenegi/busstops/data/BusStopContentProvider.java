@@ -10,11 +10,13 @@ import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
+import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_FAVOURITE;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.TABLE_NAME;
 
 /**
@@ -139,7 +141,7 @@ public class BusStopContentProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
 
         final SQLiteDatabase db = mBusStopDbHelper.getReadableDatabase();
-
+        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         int match = sUriMatcher.match(uri);
         Cursor retCursor;
 
@@ -154,6 +156,23 @@ public class BusStopContentProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
+                break;
+            case FAVOURITES:
+                builder.setTables(TABLE_NAME);
+                builder.appendWhere(COLUMN_FAVOURITE +"= 1");
+                retCursor = builder.query(db,projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                //retCursor =  db.query(TABLE_NAME,
+                      //  projection,
+                      //  selection,
+                      //  selectionArgs,
+                      //  null,
+                       // null,
+                      //  sortOrder);
                 break;
             // Default exception
             default:

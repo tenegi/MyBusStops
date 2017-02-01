@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tenegi.busstops">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,11 +18,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.tenegi.busstops.tflService.tflService"></service>
+
+        <service android:name=".tflService.tflService" />
+
         <provider
-            android:name="com.tenegi.busstops.data.BusStopContentProvider"
+            android:name=".data.BusStopContentProvider"
             android:authorities="com.tenegi.busstops"
-            android:exported="false"/>
+            android:exported="false" />
+
+        <activity android:name=".RoutesActivity"></activity>
     </application>
 
 </manifest>
