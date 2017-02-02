@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tenegi.busstops.data.BusStopContract;
+
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_ROUTE;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_RUN;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
@@ -35,6 +37,7 @@ public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdap
     public void onBindViewHolder(FavouriteViewHolder holder, int position){
         if (!mCursor.moveToPosition(position))
             return; // bail if returned null
+        long id = mCursor.getLong(mCursor.getColumnIndex(BusStopContract.BusStopEntry._ID));
         String route = mCursor.getString(mCursor.getColumnIndex(COLUMN_ROUTE));
         String stopname = mCursor.getString(mCursor.getColumnIndex(COLUMN_STOP_NAME));
         int run = mCursor.getInt(mCursor.getColumnIndex(COLUMN_RUN));
@@ -42,6 +45,7 @@ public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdap
         holder.routeNumberView.setText(route);
         holder.bustopNameView.setText(stopname);
         holder.routeDirectionView.setText(String.valueOf(run));
+        holder.itemView.setTag(id);
     }
 
     @Override
