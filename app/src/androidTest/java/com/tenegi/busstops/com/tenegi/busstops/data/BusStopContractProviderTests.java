@@ -1,4 +1,4 @@
-package com.tenegi.busstops.com.tenegi.busstops.data;
+package com.tenegi.busstops;
 
 /**
  * Created by lyndon on 29/01/2017.
@@ -161,7 +161,7 @@ public class BusStopContractProviderTests {
         testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, 529998);
         testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, 181428);
         testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, 74);
-        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 1);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 0);
 
         /* TestContentObserver allows us to test if notifyChange was called appropriately */
         TestUtilities.TestContentObserver taskObserver = TestUtilities.getTestContentObserver();
@@ -179,6 +179,36 @@ public class BusStopContractProviderTests {
 
 
         Uri uri = contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, testTaskValues);
+
+        testTaskValues = new ContentValues();
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_ROUTE, "24");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_RUN, 2);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_SEQUENCE, 3);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_CODE_LBSL, "11440");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE, "49724");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO, "490009204E");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_NAME, "MANSFIELD ROAD");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, 527754);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, 185459);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, 120);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 1);
+
+        contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, testTaskValues);
+
+        testTaskValues = new ContentValues();
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_ROUTE, "46");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_RUN, 2);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_SEQUENCE, 20);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_CODE_LBSL, "27564");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE, "54356");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO, "490001165W");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_NAME, "KENTISH TOWN WEST STATION>LOL<");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, 528667);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, 184692);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, 257);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 1);
+
+        contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, testTaskValues);
 
 
         Uri expectedUri = ContentUris.withAppendedId(BusStopContract.BusStopEntry.CONTENT_URI, 1);
@@ -225,7 +255,7 @@ public class BusStopContractProviderTests {
         testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, 529998);
         testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, 181428);
         testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, 74);
-        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 1);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 0);
 
         /* Insert ContentValues into database and get a row ID back */
         long taskRowId = database.insert(
@@ -238,6 +268,53 @@ public class BusStopContractProviderTests {
         String insertFailed = "Unable to insert directly into the database";
         assertTrue(insertFailed, taskRowId != -1);
 
+        testTaskValues = new ContentValues();
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_ROUTE, "24");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_RUN, 2);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_SEQUENCE, 3);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_CODE_LBSL, "11440");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE, "49724");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO, "490009204E");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_NAME, "MANSFIELD ROAD");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, 527754);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, 185459);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, 120);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 1);
+
+        /* Insert ContentValues into database and get a row ID back */
+        taskRowId = database.insert(
+                /* Table to insert values into */
+                BusStopContract.BusStopEntry.TABLE_NAME,
+                null,
+                /* Values to insert into table */
+                testTaskValues);
+
+        insertFailed = "Unable to insert directly into the database";
+        assertTrue(insertFailed, taskRowId != -1);
+
+        testTaskValues = new ContentValues();
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_ROUTE, "46");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_RUN, 2);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_SEQUENCE, 20);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_CODE_LBSL, "27564");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE, "54356");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO, "490001165W");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_NAME, "KENTISH TOWN WEST STATION>LOL<");
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, 528667);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, 184692);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, 257);
+        testTaskValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 1);
+
+        /* Insert ContentValues into database and get a row ID back */
+        taskRowId = database.insert(
+                /* Table to insert values into */
+                BusStopContract.BusStopEntry.TABLE_NAME,
+                null,
+                /* Values to insert into table */
+                testTaskValues);
+
+        insertFailed = "Unable to insert directly into the database";
+        assertTrue(insertFailed, taskRowId != -1);
         /* We are done with the database, close it now. */
         database.close();
 

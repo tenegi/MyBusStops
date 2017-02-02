@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BusStops</string>
+    <string name="action_routes">Routes</string>
 </resources>
