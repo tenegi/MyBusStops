@@ -13,9 +13,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 
+import static android.provider.BaseColumns._ID;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_FAVOURITE;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.TABLE_NAME;
 
@@ -31,6 +33,7 @@ public class BusStopContentProvider extends ContentProvider {
     public static final int BUSROUTES = 200;
     public static final int BUSROUTE_WITH_ID = 201;
     public static final int FAVOURITES = 300;
+    public static final int FAVOURITES_WITH_ID = 301;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -49,6 +52,7 @@ public class BusStopContentProvider extends ContentProvider {
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES, BUSROUTES);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES + "/#", BUSROUTE_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES, FAVOURITES);
+        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES + "/#", FAVOURITES_WITH_ID);
 
         return uriMatcher;
     }
@@ -198,7 +202,36 @@ public class BusStopContentProvider extends ContentProvider {
     public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        int count = 0;
+        final SQLiteDatabase db = mBusStopDbHelper.getWritableDatabase();
+        int insertCount = 0;
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case FAVOURITES_WITH_ID:
+                try{
+                    String segment = uri.getLastPathSegment();
+                    String whereClause = _ID +"=" + segment;
+                    String additionalWhere = (!TextUtils.isEmpty(selection) ? " AND (" + selection + ")" : "");
+                    if(!TextUtils.isEmpty(additionalWhere)){
+                        whereClause += additionalWhere;
+                    }
+                    db.beginTransaction();
+                    count= db.update(TABLE_NAME,values,whereClause, selectionArgs);
+                    db.setTransactionSuccessful();
+                } catch(Exception e){
+                    e.printStackTrace();
+                } finally{
+                    db.endTransaction();
+                }
+                break;
+            // COMPLETED (4) Set the value for the returnedUri and write the default case for unknown URI's
+            // Default case throws an UnsupportedOperationException
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
+
     }
 
 
