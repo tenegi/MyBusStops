@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -51,7 +52,7 @@ public class BusStopContentProvider extends ContentProvider {
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS, BUSSTOPS);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS + "/#", BUSSTOPS_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES, BUSROUTES);
-        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES + "/#", BUSROUTE_WITH_ID);
+        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES + "/*", BUSROUTE_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES, FAVOURITES);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES + "/#", FAVOURITES_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_LOADER_TABLE, LOADER_TABLE);
@@ -179,6 +180,67 @@ public class BusStopContentProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
+            case BUSROUTES:
+
+                String allRoutesQuery = "SELECT "
+                        + "b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + ",b." + BusStopContract.BusStopEntry.COLUMN_RUN
+                        + ",b." + BusStopContract.BusStopEntry.COLUMN_STOP_NAME
+                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " as b "
+                        + " INNER JOIN ("
+                        + "SELECT " + BusStopContract.BusStopEntry.COLUMN_ROUTE + ", "
+                        + BusStopContract.BusStopEntry.COLUMN_RUN
+                        + ", MAX(" + BusStopContract.BusStopEntry.COLUMN_SEQUENCE +") as seq"
+                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " GROUP BY "
+                        + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + ", " +BusStopContract.BusStopEntry.COLUMN_RUN +") as X"
+                        + " ON (b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + " = x." + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_RUN
+                        + " = x." +BusStopContract.BusStopEntry.COLUMN_RUN
+                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_SEQUENCE
+                        + " = x.seq) "
+                        +" ORDER BY CAST(b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " as INTEGER) ,b."
+                        + BusStopContract.BusStopEntry.COLUMN_RUN + ";";
+
+
+
+                Log.d("ContentProvider", "Union query =  " + allRoutesQuery);
+                        retCursor = db.rawQuery(allRoutesQuery, null);
+
+
+                break;
+            case BUSROUTE_WITH_ID:
+                String segment = uri.getLastPathSegment();
+                String searchQuery = "SELECT "
+                        + "b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + ",b." + BusStopContract.BusStopEntry.COLUMN_RUN
+                        + ",b." + BusStopContract.BusStopEntry.COLUMN_STOP_NAME
+                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " as b "
+                        + " INNER JOIN ("
+                        + "SELECT " + BusStopContract.BusStopEntry.COLUMN_ROUTE + ", "
+                        + BusStopContract.BusStopEntry.COLUMN_RUN
+                        + ", MAX(" + BusStopContract.BusStopEntry.COLUMN_SEQUENCE +") as seq"
+                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " GROUP BY "
+                        + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + ", " +BusStopContract.BusStopEntry.COLUMN_RUN +") as X"
+                        + " ON (b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + " = x." + BusStopContract.BusStopEntry.COLUMN_ROUTE
+                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_RUN
+                        + " = x." +BusStopContract.BusStopEntry.COLUMN_RUN
+                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_SEQUENCE
+                        + " = x.seq) "
+                        +" WHERE b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " LIKE '%" + segment + "%' "
+                        + " ORDER BY CAST(b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " as INTEGER) ,b."
+                        + BusStopContract.BusStopEntry.COLUMN_RUN + ";";
+
+
+
+                Log.d("ContentProvider", "Union query =  " + searchQuery);
+                retCursor = db.rawQuery(searchQuery, null);
+
+
+                break;
             case FAVOURITES:
                 builder.setTables(TABLE_NAME);
                 builder.appendWhere(COLUMN_FAVOURITE +"= 1");
@@ -188,13 +250,7 @@ public class BusStopContentProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                //retCursor =  db.query(TABLE_NAME,
-                      //  projection,
-                      //  selection,
-                      //  selectionArgs,
-                      //  null,
-                       // null,
-                      //  sortOrder);
+
                 break;
             // Default exception
             default:

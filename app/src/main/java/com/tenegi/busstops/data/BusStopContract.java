@@ -13,7 +13,7 @@ public class BusStopContract {
     public static final String AUTHORITY = "com.tenegi.busstops";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
     public static final String PATH_BUSSTOPS = "busstops";
-    public static final String PATH_BUSROUTES = "busstops/routes";
+    public static final String PATH_BUSROUTES = "routes";
     public static final String PATH_FAVOURITES = "favourites";
     public static final String PATH_LOADER_TABLE = "load";
 
