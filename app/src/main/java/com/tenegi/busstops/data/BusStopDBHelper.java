@@ -12,7 +12,7 @@ import com.tenegi.busstops.data.BusStopContract.*;
 public class BusStopDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "busstops.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public BusStopDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -37,6 +37,23 @@ public class BusStopDBHelper extends SQLiteOpenHelper {
                 "); ";
 
         sqLiteDatabase.execSQL(SQL_CREATE_BUSSTOP_TABLE);
+
+        final String SQL_CREATE_LOADER_TABLE = "CREATE TABLE " + LoadEntry.TABLE_NAME + " (" +
+                LoadEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                LoadEntry.COLUMN_ROUTE + " TEXT NOT NULL, " +
+                LoadEntry.COLUMN_RUN + " INTEGER NOT NULL, " +
+                LoadEntry.COLUMN_SEQUENCE + " INTEGER NOT NULL, " +
+                LoadEntry.COLUMN_STOP_CODE_LBSL + " TEXT NOT NULL, " +
+                LoadEntry.COLUMN_BUS_STOP_CODE + " TEXT NOT NULL, " +
+                LoadEntry.COLUMN_NAPTAN_ATCO + " TEXT NOT NULL, " +
+                LoadEntry.COLUMN_STOP_NAME + " TEXT NOT NULL, " +
+                LoadEntry.COLUMN_LOCATION_EASTING + " INTEGER NOT NULL, " +
+                LoadEntry.COLUMN_LOCATION_NORTHING + " INTEGER NOT NULL, " +
+                LoadEntry.COLUMN_HEADING + " INTEGER NOT NULL, " +
+                LoadEntry.COLUMN_FAVOURITE + " INTEGER DEFAULT 0 NOT NULL " +
+                "); ";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_LOADER_TABLE);
     }
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
@@ -46,6 +63,7 @@ public class BusStopDBHelper extends SQLiteOpenHelper {
         // instead of dropping it, so that existing data is not deleted.
         // COMPLETED (9) Inside, execute a drop table query, and then call onCreate to re-create it
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusStopEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LoadEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 

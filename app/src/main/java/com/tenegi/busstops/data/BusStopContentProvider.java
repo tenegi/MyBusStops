@@ -34,6 +34,7 @@ public class BusStopContentProvider extends ContentProvider {
     public static final int BUSROUTE_WITH_ID = 201;
     public static final int FAVOURITES = 300;
     public static final int FAVOURITES_WITH_ID = 301;
+    public static final int LOADER_TABLE = 400;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -53,6 +54,7 @@ public class BusStopContentProvider extends ContentProvider {
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES + "/#", BUSROUTE_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES, FAVOURITES);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES + "/#", FAVOURITES_WITH_ID);
+        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_LOADER_TABLE, LOADER_TABLE);
 
         return uriMatcher;
     }
@@ -117,7 +119,23 @@ public class BusStopContentProvider extends ContentProvider {
                 try{
                     db.beginTransaction();
                     for(ContentValues value : values){
-                        long id = db.insert(TABLE_NAME, null, value);
+                        long id = db.insert(BusStopContract.BusStopEntry.TABLE_NAME, null, value);
+                        if(id > 0){
+                            insertCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } catch(Exception e){
+                    e.printStackTrace();
+                } finally{
+                    db.endTransaction();
+                }
+                break;
+            case LOADER_TABLE:
+                try{
+                    db.beginTransaction();
+                    for(ContentValues value : values){
+                        long id = db.insert(BusStopContract.LoadEntry.TABLE_NAME, null, value);
                         if(id > 0){
                             insertCount++;
                         }
@@ -194,8 +212,30 @@ public class BusStopContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        int count = 0;
+        final SQLiteDatabase db = mBusStopDbHelper.getWritableDatabase();
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case LOADER_TABLE:
+                try{
+
+                    db.beginTransaction();
+                    count= db.delete(BusStopContract.LoadEntry.TABLE_NAME,null,null);
+                    db.setTransactionSuccessful();
+                } catch(Exception e){
+                    e.printStackTrace();
+                } finally{
+                    db.endTransaction();
+                }
+                break;
+            // COMPLETED (4) Set the value for the returnedUri and write the default case for unknown URI's
+            // Default case throws an UnsupportedOperationException
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        return count;
     }
+
 
 
     @Override
