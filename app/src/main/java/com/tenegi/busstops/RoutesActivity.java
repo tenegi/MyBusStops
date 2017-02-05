@@ -26,15 +26,14 @@ import android.widget.Toast;
 import com.tenegi.busstops.tflService.tflService;
 
 import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_ROUTE;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
 import static com.tenegi.busstops.data.BusStopContract.PATH_BUSROUTES;
-import static com.tenegi.busstops.data.BusStopContract.PATH_FAVOURITES;
+import static java.security.AccessController.getContext;
 
-public class RoutesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
-
-         {
+public class RoutesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
     private static final String TAG = "Routes Activity";
+    private static final int ROUTES_LOADER = 1;
+    //private static final int SETTINGS_LOADER = 2;
+
     private TextView statusTextView;
     private RouteListAdapter mAdapter;
     RecyclerView routesRecyclerView;
@@ -65,21 +64,27 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
         statusTextView = (TextView) findViewById(R.id.status);
         routesRecyclerView = (RecyclerView) findViewById(R.id.routes_list_view);
         routesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        getSupportLoaderManager().initLoader(1,null,this);
+        getSupportLoaderManager().initLoader(ROUTES_LOADER,null,this);
+        //getSupportLoaderManager().initLoader(SETTINGS_LOADER,null,this);
     }
-    public void restartLoader(){
+    public void restartLoader(int loader){
 
-        getSupportLoaderManager().restartLoader(1,null,this);
+        getSupportLoaderManager().restartLoader(loader,null,this);
     }
     @Override
     public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1){
         Uri CONTENT_URI;
-        if(queryText == "") {
-            CONTENT_URI =
-                    BASE_CONTENT_URI.buildUpon().appendPath(PATH_BUSROUTES).build();
-        } else {
-            CONTENT_URI =
-                    BASE_CONTENT_URI.buildUpon().appendPath(PATH_BUSROUTES).appendPath(queryText).build();
+        switch(arg0) {
+            case ROUTES_LOADER:
+                if (queryText == "") {
+                    CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_BUSROUTES).build();
+                } else {
+                    CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_BUSROUTES).appendPath(queryText).build();
+                }
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown loader id " + arg0);
         }
         Log.d(TAG, "Content uri = " + CONTENT_URI + " base uri = " + BASE_CONTENT_URI);
         cursorLoader = new CursorLoader(this,CONTENT_URI,null,null,null,null );
@@ -87,19 +92,42 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
     }
     @Override
     public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-        int rows = cursor.getCount();
-        Log.d(TAG, rows + " Routes found");
-        if (rows == 0) {
-            statusTextView.setText("No Routes found");
-        } else {
-            cursor.moveToFirst();
+        switch(arg0.getId()){
+            case ROUTES_LOADER:
+                int rows = cursor.getCount();
+                Log.d(TAG, rows + " Routes found");
+                if (rows == 0) {
+                    statusTextView.setText("No Routes found");
+                } else {
+                    cursor.moveToFirst();
+                    //statusTextView.setText(rows + " routes found");
+                    cursor.moveToFirst();
+                    mAdapter = new RouteListAdapter(this, cursor);
+                    mAdapter.setOnItemClickListener(new RouteListAdapter.ClickListener() {
+                        @Override
+                        public void onItemClick(int position, View v) {
+                            String t = (String) v.getTag();
+                            Log.d(TAG, "onItemClick position: " + position + ", tag = " + t);
+                            //Toast.makeText(RoutesActivity.this, "Item Clicked " + t, Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(getApplicationContext(), StopsActivity.class);
+                            i.putExtra("route",t);
+                            startActivity(i);
+                        }
 
-            statusTextView.setText(rows + " routes found");
-            cursor.moveToFirst();
-            mAdapter = new RouteListAdapter(this, cursor);
+                        @Override
+                        public void onItemLongClick(int position, View v) {
+                            String t = (String) v.getTag();
+                            Log.d(TAG, "onItemLongClick position: " + position + ", tag = " + t);
+                            //Toast.makeText(RoutesActivity.this, "Item Long Clicked " + t, Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(getApplicationContext(), StopsActivity.class);
+                            i.putExtra("route",t);
+                            startActivity(i);
+                        }
+                    });
+                    routesRecyclerView.setAdapter(mAdapter);
+                }
+                break;
 
-            // Link the adapter to the RecyclerView
-            routesRecyclerView.setAdapter(mAdapter);
         }
     }
     @Override
@@ -126,7 +154,7 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.route_acivity_menu, menu);
+        inflater.inflate(R.menu.route_activity_menu, menu);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
@@ -134,7 +162,7 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
             @Override
             public boolean onQueryTextSubmit(String query) {
                 queryText = query;
-                restartLoader();
+                restartLoader(ROUTES_LOADER);
                 return false;
             }
 
@@ -142,7 +170,7 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
             public boolean onQueryTextChange(String newText) {
                 if (searchView.getQuery().length() == 0) {
                     queryText = "";
-                    restartLoader();
+                    restartLoader(ROUTES_LOADER);
                 }
                 return false;
             }

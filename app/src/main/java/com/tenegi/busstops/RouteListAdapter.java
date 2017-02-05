@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tenegi.busstops.data.BusStopContract;
 
@@ -22,20 +23,26 @@ public class RouteListAdapter extends RecyclerView.Adapter<RouteListAdapter.Rout
 
     private Context mContext;
     private Cursor mCursor;
+    private static ClickListener clickListener;
 
-
+    public interface ClickListener {
+        void onItemClick(int position, View v);
+        void onItemLongClick(int position, View v);
+    }
 
     public RouteListAdapter(Context context, Cursor cursor){
         this.mContext = context;
         this.mCursor = cursor;
-
-
+    }
+    public void setOnItemClickListener(ClickListener clickListener) {
+        RouteListAdapter.clickListener = clickListener;
     }
 
     @Override
     public RouteListAdapter.RouteViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.route_item, parent, false);
+
         return new RouteListAdapter.RouteViewHolder(view);
     }
     @Override
@@ -49,23 +56,39 @@ public class RouteListAdapter extends RecyclerView.Adapter<RouteListAdapter.Rout
 
         holder.routeNumberView.setText(route);
         holder.routeDescriptionView.setText(String.valueOf(run) + " to " + stopname);
-        holder.itemView.setTag(route + ":" + String.valueOf(run));
+        holder.itemView.setTag(route + "~" + String.valueOf(run));
     }
     @Override
     public int getItemCount() {
         return mCursor.getCount();
     }
-    class RouteViewHolder extends RecyclerView.ViewHolder{
+    class RouteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
         TextView routeNumberView;
         TextView routeDescriptionView;
         TextView bustopNameView;
 
+
         public RouteViewHolder(View itemView) {
 
             super(itemView);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+
             routeNumberView = (TextView) itemView.findViewById(R.id.route_number);
             routeDescriptionView = (TextView) itemView.findViewById(R.id.route_description);
         }
+        @Override
+        public void onClick(View v) {
+            clickListener.onItemClick(getAdapterPosition(), v);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            clickListener.onItemLongClick(getAdapterPosition(), v);
+            return false;
+        }
+
+
     }
 }

@@ -28,16 +28,31 @@ import com.tenegi.busstops.data.BusStopContract;
 import com.tenegi.busstops.tflService.tflService;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_ROUTE;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
 import static com.tenegi.busstops.data.BusStopContract.PATH_FAVOURITES;
+import static com.tenegi.busstops.data.BusStopContract.PATH_SETTINGS;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
     private static final String TAG = "Main Activity";
+    private static final int FAVOURITES_LOADER = 1;
+    private static final int SETTINGS_LOADER = 2;
+    private String ROUTES_URL = "";
+    private String STOPPOINT_URL = "";
+    private String STOPPOINT_PATH = "";
+    private String STOPPOINT_APPID = "";
+    private String STOPPOINT_APPKEY = "";
+    private Date DATE_LAST_UPDATED;
+    private boolean NEED_ROUTES_REFRESH = false;
     private FavouriteListAdapter mAdapter;
     private TextView statusTextView;
+    private TextView settingsStatusTextView;
     RecyclerView favouriteRecyclerView;
     CursorLoader cursorLoader;
     Context mContext = this;
@@ -45,12 +60,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportLoaderManager().initLoader(SETTINGS_LOADER,null,this);
         setContentView(R.layout.activity_main);
+
         statusTextView = (TextView) findViewById(R.id.status);
+        settingsStatusTextView = (TextView) findViewById(R.id.settingsStatus);
         //RecyclerView favouriteRecyclerView;
         favouriteRecyclerView = (RecyclerView) findViewById(R.id.favourites_list_view);
         favouriteRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        getSupportLoaderManager().initLoader(1,null,this);
+        getSupportLoaderManager().initLoader(FAVOURITES_LOADER,null,this);
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -59,58 +77,91 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // COMPLETED (8) Inside, get the viewHolder's itemView's tag and store in a long variable id
-                //get the id of the item being swiped
                 long id = (long) viewHolder.itemView.getTag();
-                // COMPLETED (9) call removeGuest and pass through that id
-                //remove from DB
                 removeFavourite(id);
-                // COMPLETED (10) call swapCursor on mAdapter passing in getAllGuests() as the argument
-                //update the list
-                restartLoader();
+                restartLoader(FAVOURITES_LOADER);
             }
-
-            //COMPLETED (11) attach the ItemTouchHelper to the waitlistRecyclerView
         }).attachToRecyclerView(favouriteRecyclerView);
 
         }
     public void onClick(View view){
 
-        getSupportLoaderManager().initLoader(1,null,this);
+        getSupportLoaderManager().initLoader(FAVOURITES_LOADER,null,this);
     }
-    public void restartLoader(){
-        getSupportLoaderManager().initLoader(1,null,this);
+    public void restartLoader(int loader){
+
+        getSupportLoaderManager().initLoader(loader,null,this);
     }
     @Override
     public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1){
-        Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVOURITES).build();
+        Uri CONTENT_URI;
+        switch(arg0){
+            case SETTINGS_LOADER:
+                CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_SETTINGS).build();
+                break;
+            case FAVOURITES_LOADER:
+                CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVOURITES).build();
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown loader id " + arg0);
+        }
         Log.d(TAG, "Content uri = " + CONTENT_URI + " base uri = " + BASE_CONTENT_URI);
         cursorLoader = new CursorLoader(this,CONTENT_URI,null,null,null,null );
         return cursorLoader;
     }
     @Override
     public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-        int rows = cursor.getCount();
-        if (rows == 0) {
-            statusTextView.setText("No Favourites found");
-        } else {
-            cursor.moveToFirst();
-            StringBuilder sb = new StringBuilder();
-            while(!cursor.isAfterLast()){
-                String route = cursor.getString(cursor.getColumnIndex(COLUMN_ROUTE));
-                String stopname = cursor.getString(cursor.getColumnIndex(COLUMN_STOP_NAME));
-                Log.d(TAG, "Route found " + route + " stopname = " + stopname);
-                sb.append("\n" + route + ", " + stopname);
-                cursor.moveToNext();
-            }
-            statusTextView.setText(rows + " Favourites found" + sb);
-            cursor.moveToFirst();
-            mAdapter = new FavouriteListAdapter(this, cursor);
+        switch(arg0.getId()){
+            case FAVOURITES_LOADER:
+                int rows = cursor.getCount();
+                if (rows == 0) {
+                    statusTextView.setText("No Favourites found");
+                } else {
+                    cursor.moveToFirst();
+                    StringBuilder sb = new StringBuilder();
+                    while (!cursor.isAfterLast()) {
+                        String route = cursor.getString(cursor.getColumnIndex(COLUMN_ROUTE));
+                        String stopname = cursor.getString(cursor.getColumnIndex(COLUMN_STOP_NAME));
+                        Log.d(TAG, "Route found " + route + " stopname = " + stopname);
+                        sb.append("\n" + route + ", " + stopname);
+                        cursor.moveToNext();
+                    }
+                    statusTextView.setText(rows + " Favourites found" + sb);
+                    cursor.moveToFirst();
+                    mAdapter = new FavouriteListAdapter(this, cursor);
+                    favouriteRecyclerView.setAdapter(mAdapter);
+                }
+                break;
+            case SETTINGS_LOADER:
+                int settingsRows = cursor.getCount();
+                Log.d(TAG, settingsRows + " Settings found");
+                cursor.moveToFirst();
+                ROUTES_URL = cursor.getString(cursor.getColumnIndex(BusStopContract.SettingsEntry.COLUMN_ROUTES_URL));
+                STOPPOINT_URL = cursor.getString(cursor.getColumnIndex(BusStopContract.SettingsEntry.COLUMN_STOPPOINT_URL));
+                STOPPOINT_PATH = cursor.getString(cursor.getColumnIndex(BusStopContract.SettingsEntry.COLUMN_STOPPOINT_PATH));
+                STOPPOINT_APPID = cursor.getString(cursor.getColumnIndex(BusStopContract.SettingsEntry.COLUMN_STOPPOINT_APPID));
+                STOPPOINT_APPKEY = cursor.getString(cursor.getColumnIndex(BusStopContract.SettingsEntry.COLUMN_STOPPOINT_APPKEY));
+                String s= cursor.getString(cursor.getColumnIndex(BusStopContract.SettingsEntry.COLUMN_DATE_UPDATED));
+                cursor.close();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date d=new Date();
+                try {
+                    d=  dateFormat.parse(s);
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                DATE_LAST_UPDATED = d;
+                Calendar today = Calendar.getInstance();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(d);
+                cal.add(Calendar.DAY_OF_YEAR, 7);
+                NEED_ROUTES_REFRESH = cal.before(today);
+                settingsStatusTextView.setText(NEED_ROUTES_REFRESH ? "need to refresh" : "routes up to date");
+                break;
 
-            // Link the adapter to the RecyclerView
-            favouriteRecyclerView.setAdapter(mAdapter);
         }
+
     }
     @Override
     public void onLoaderReset(Loader<Cursor> arg0){

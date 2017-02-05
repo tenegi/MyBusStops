@@ -26,7 +26,8 @@
             android:authorities="com.tenegi.busstops"
             android:exported="false" />
 
-        <activity android:name=".RoutesActivity"></activity>
+        <activity android:name=".RoutesActivity" />
+        <activity android:name=".StopsActivity"></activity>
     </application>
 
 </manifest>

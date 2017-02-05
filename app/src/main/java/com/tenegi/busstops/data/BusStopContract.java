@@ -4,6 +4,8 @@ package com.tenegi.busstops.data;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import java.sql.Date;
+
 /**
  * Created by lyndon on 29/01/2017.
  */
@@ -16,6 +18,7 @@ public class BusStopContract {
     public static final String PATH_BUSROUTES = "routes";
     public static final String PATH_FAVOURITES = "favourites";
     public static final String PATH_LOADER_TABLE = "load";
+    public static final String PATH_SETTINGS = "settings";
 
     public static final class BusStopEntry implements BaseColumns {
 
@@ -53,5 +56,19 @@ public class BusStopContract {
         public static final String COLUMN_LOCATION_NORTHING = "Location_Northing";
         public static final String COLUMN_HEADING = "Heading";
         public static final String COLUMN_FAVOURITE = "Favourite";
+    }
+
+    public static final class SettingsEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_SETTINGS).build();
+
+        public static final String TABLE_NAME = "settings";
+        public static final String COLUMN_ROUTES_URL = "Routes_url";
+        public static final String COLUMN_STOPPOINT_URL = "StopPoint_Url";
+        public static final String COLUMN_STOPPOINT_PATH = "StopPoint_Path";
+        public static final String COLUMN_STOPPOINT_APPID = "Times_AppId";
+        public static final String COLUMN_STOPPOINT_APPKEY = "Times_AppKey";
+        public static final String COLUMN_DATE_UPDATED = "Last_Updated";
     }
 }
