@@ -106,7 +106,7 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
                     mAdapter.setOnItemClickListener(new RouteListAdapter.ClickListener() {
                         @Override
                         public void onItemClick(int position, View v) {
-                            String t = (String) v.getTag();
+                            String t = v.getTag().toString();
                             Log.d(TAG, "onItemClick position: " + position + ", tag = " + t);
                             //Toast.makeText(RoutesActivity.this, "Item Clicked " + t, Toast.LENGTH_LONG).show();
                             Intent i = new Intent(getApplicationContext(), StopsActivity.class);
@@ -116,7 +116,7 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
 
                         @Override
                         public void onItemLongClick(int position, View v) {
-                            String t = (String) v.getTag();
+                            String t = v.getTag().toString();
                             Log.d(TAG, "onItemLongClick position: " + position + ", tag = " + t);
                             //Toast.makeText(RoutesActivity.this, "Item Long Clicked " + t, Toast.LENGTH_LONG).show();
                             Intent i = new Intent(getApplicationContext(), StopsActivity.class);

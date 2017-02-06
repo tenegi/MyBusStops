@@ -31,6 +31,7 @@ public class BusStopContentProvider extends ContentProvider {
     private BusStopDBHelper mBusStopDbHelper;
     public static final int BUSSTOPS = 100;
     public static final int BUSSTOPS_WITH_ID = 101;
+    public static final int BUSSTOPS_WITH_ROUTE_AND_RUN = 102;
     public static final int BUSROUTES = 200;
     public static final int BUSROUTE_WITH_ID = 201;
     public static final int FAVOURITES = 300;
@@ -51,7 +52,8 @@ public class BusStopContentProvider extends ContentProvider {
           The two calls below add matches for the task directory and a single item by ID.
          */
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS, BUSSTOPS);
-        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS + "/*", BUSSTOPS_WITH_ID);
+        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS + "/#", BUSSTOPS_WITH_ID);
+        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS + "/*", BUSSTOPS_WITH_ROUTE_AND_RUN);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES, BUSROUTES);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES + "/*", BUSROUTE_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES, FAVOURITES);
@@ -174,6 +176,7 @@ public class BusStopContentProvider extends ContentProvider {
         switch (match) {
             //get ALL stops for all routes
             case BUSSTOPS:
+                Log.d("ContentProvider", "all stops query");
                 retCursor =  db.query(TABLE_NAME,
                         projection,
                         selection,
@@ -183,6 +186,16 @@ public class BusStopContentProvider extends ContentProvider {
                         sortOrder);
                 break;
             case BUSSTOPS_WITH_ID:
+                //get one bus stop
+                String querySql = getSqlForOneStop(uri.getLastPathSegment());
+                Log.d("ContentProvider", "one stop query = " + querySql);
+                builder.setTables(TABLE_NAME);
+                builder.appendWhere(_ID + "="
+                        + uri.getLastPathSegment());
+
+                retCursor = db.rawQuery(querySql, null);
+                break;
+            case BUSSTOPS_WITH_ROUTE_AND_RUN:
                 //get all the stops for route and run passed as query string
                 // format route~run
                 String query = getSqlForStopsPerRoute(uri.getLastPathSegment());
@@ -192,29 +205,6 @@ public class BusStopContentProvider extends ContentProvider {
             case BUSROUTES:
                 // This gets us all the bus routes, with start and end point
                 String routesQuery = getSqlForRouteList();
-                /*
-                String allRoutesQuery = "SELECT "
-                        + "b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + ",b." + BusStopContract.BusStopEntry.COLUMN_RUN
-                        + ",b." + BusStopContract.BusStopEntry.COLUMN_STOP_NAME
-                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " as b "
-                        + " INNER JOIN ("
-                        + "SELECT " + BusStopContract.BusStopEntry.COLUMN_ROUTE + ", "
-                        + BusStopContract.BusStopEntry.COLUMN_RUN
-                        + ", MAX(" + BusStopContract.BusStopEntry.COLUMN_SEQUENCE +") as seq"
-                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " GROUP BY "
-                        + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + ", " +BusStopContract.BusStopEntry.COLUMN_RUN +") as X"
-                        + " ON (b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + " = x." + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_RUN
-                        + " = x." +BusStopContract.BusStopEntry.COLUMN_RUN
-                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_SEQUENCE
-                        + " = x.seq) "
-                        +" ORDER BY CAST(b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " as INTEGER) ,b."
-                        + BusStopContract.BusStopEntry.COLUMN_RUN + ";";
-                        */
-
 
                 Log.d("ContentProvider", "all routes query =  " + routesQuery);
                         retCursor = db.rawQuery(routesQuery, null);
@@ -225,32 +215,7 @@ public class BusStopContentProvider extends ContentProvider {
                 // This gets us all the bus routes, with start and end point
                 // that match the string passed in as the query string
                 String searchQuery = getSqlForFilteredRoutesList(uri.getLastPathSegment());
-                /*
-                String segment = uri.getLastPathSegment();
-                String searchQuery = "SELECT "
-                        + "b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + ",b." + BusStopContract.BusStopEntry.COLUMN_RUN
-                        + ",b." + BusStopContract.BusStopEntry.COLUMN_STOP_NAME
-                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " as b "
-                        + " INNER JOIN ("
-                        + "SELECT " + BusStopContract.BusStopEntry.COLUMN_ROUTE + ", "
-                        + BusStopContract.BusStopEntry.COLUMN_RUN
-                        + ", MAX(" + BusStopContract.BusStopEntry.COLUMN_SEQUENCE +") as seq"
-                        + " FROM " + BusStopContract.BusStopEntry.TABLE_NAME + " GROUP BY "
-                        + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + ", " +BusStopContract.BusStopEntry.COLUMN_RUN +") as X"
-                        + " ON (b." + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + " = x." + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_RUN
-                        + " = x." +BusStopContract.BusStopEntry.COLUMN_RUN
-                        + " AND b." + BusStopContract.BusStopEntry.COLUMN_SEQUENCE
-                        + " = x.seq) "
-                        +" WHERE b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " LIKE '%" + segment + "%' "
-                        + " ORDER BY CAST(b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " as INTEGER) ,b."
-                        + BusStopContract.BusStopEntry.COLUMN_RUN + ";";
 
-
-*/
                 Log.d("ContentProvider", "Union query =  " + searchQuery);
                 retCursor = db.rawQuery(searchQuery, null);
 
@@ -426,6 +391,18 @@ public class BusStopContentProvider extends ContentProvider {
                 +" WHERE b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " LIKE '%" + filter + "%' "
                 + " ORDER BY CAST(b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " as INTEGER) ,b."
                 + BusStopContract.BusStopEntry.COLUMN_RUN + ";";
+        return searchQuery;
+    }
+    private String getSqlForOneStop(String filter){
+        String searchQuery = "SELECT "
+                + BusStopContract.BusStopEntry.COLUMN_STOP_NAME
+                + ", "
+                + BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO
+                + " FROM "
+                + BusStopContract.BusStopEntry.TABLE_NAME
+                +" WHERE "+ BusStopContract.BusStopEntry._ID
+                + " = " + filter
+                + ";";
         return searchQuery;
     }
 

@@ -129,6 +129,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     statusTextView.setText(rows + " Favourites found" + sb);
                     cursor.moveToFirst();
                     mAdapter = new FavouriteListAdapter(this, cursor);
+                    mAdapter.setOnItemClickListener(new FavouriteListAdapter.ClickListener() {
+                        @Override
+                        public void onItemClick(int position, View v) {
+                            String t = v.getTag().toString();
+                            Log.d(TAG, "onItemClick position: " + position + ", tag = " + t);
+                            Toast.makeText(MainActivity.this, "Item Clicked " + t, Toast.LENGTH_LONG).show();
+
+                        }
+
+                        @Override
+                        public void onItemLongClick(int position, View v) {
+                            long tagValue = (long) v.getTag();
+                            String t = String.valueOf(tagValue);
+                            Log.d(TAG, "onItemLongClick position: " + position + ", tag = " + t);
+                            Toast.makeText(MainActivity.this, "Item Long Clicked " + t, Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(getApplicationContext(), TimesActivity.class);
+                            i.putExtra("STOPPOINT_URL",STOPPOINT_URL);
+                            i.putExtra("STOPPOINT_PATH",STOPPOINT_PATH);
+                            i.putExtra("STOPPOINT_APPID",STOPPOINT_APPID);
+                            i.putExtra("STOPPOINT_APPKEY",STOPPOINT_APPKEY);
+                            i.putExtra("id",tagValue);
+                            startActivity(i);
+                        }
+                    });
                     favouriteRecyclerView.setAdapter(mAdapter);
                 }
                 break;
@@ -192,9 +216,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_routes) {
-            Intent startSettingsActivity = new Intent(this, RoutesActivity.class);
+            Intent startRoutesActivity = new Intent(this, RoutesActivity.class);
 
-            startActivity(startSettingsActivity);
+            startActivity(startRoutesActivity);
 
             return true;
         }

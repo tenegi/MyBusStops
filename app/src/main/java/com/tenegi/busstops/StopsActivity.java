@@ -72,7 +72,6 @@ public class StopsActivity extends AppCompatActivity implements LoaderManager.Lo
                     mRouteNumberView.setText(route + " - No stops found");
                 } else {
                     cursor.moveToFirst();
-                    cursor.moveToFirst();
                     mAdapter = new StopListAdapter(this, cursor);
                     mAdapter.setOnItemClickListener(new StopListAdapter.ClickListener() {
                         @Override

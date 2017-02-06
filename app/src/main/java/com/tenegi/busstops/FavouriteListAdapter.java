@@ -21,6 +21,15 @@ public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdap
 
     private Context mContext;
     private Cursor mCursor;
+    private static ClickListener clickListener;
+
+    public interface ClickListener {
+        void onItemClick(int position, View v);
+        void onItemLongClick(int position, View v);
+    }
+    public void setOnItemClickListener(ClickListener clickListener) {
+        FavouriteListAdapter.clickListener = clickListener;
+    }
 
     public FavouriteListAdapter(Context context, Cursor cursor){
         this.mContext = context;
@@ -50,9 +59,10 @@ public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdap
 
     @Override
     public int getItemCount() {
+
         return mCursor.getCount();
     }
-    class FavouriteViewHolder extends RecyclerView.ViewHolder{
+    class FavouriteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
         TextView routeNumberView;
         TextView routeDirectionView;
@@ -64,6 +74,18 @@ public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdap
             routeNumberView = (TextView) itemView.findViewById(R.id.route_number);
             routeDirectionView = (TextView) itemView.findViewById(R.id.route_direction);
             bustopNameView = (TextView) itemView.findViewById(R.id.stop_name);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+        @Override
+        public void onClick(View v) {
+            clickListener.onItemClick(getAdapterPosition(), v);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            clickListener.onItemLongClick(getAdapterPosition(), v);
+            return false;
         }
     }
 }

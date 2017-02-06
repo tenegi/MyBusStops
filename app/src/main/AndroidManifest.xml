@@ -27,7 +27,8 @@
             android:exported="false" />
 
         <activity android:name=".RoutesActivity" />
-        <activity android:name=".StopsActivity"></activity>
+        <activity android:name=".StopsActivity" />
+        <activity android:name=".TimesActivity"></activity>
     </application>
 
 </manifest>
