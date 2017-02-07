@@ -20,7 +20,7 @@
         </activity>
 
         <service android:name=".tflService.tflService" />
-
+        <service android:name=".tflService.tflGetBusTimesService" />
         <provider
             android:name=".data.BusStopContentProvider"
             android:authorities="com.tenegi.busstops"
