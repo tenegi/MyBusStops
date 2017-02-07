@@ -72,6 +72,7 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
                 ArrayList<String> results = b.getStringArrayList("timings");
                 if(results != null){
                     Log.d(TAG, "Broadcast receiver results = " + results.size());
+
                     BusTimesAdapter adapter = new BusTimesAdapter(TimesActivity.this, results);
                     timesRecyclerView.setAdapter(adapter);
                 }else {
@@ -145,6 +146,7 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
     }
     @Override
     public void onDestroy(){
+        Log.d(TAG, "times activity destroyed");
         stopService(new Intent(this, tflGetBusTimesService.class));
         super.onDestroy();
     }

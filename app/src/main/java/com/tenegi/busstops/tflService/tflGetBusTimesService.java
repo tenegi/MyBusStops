@@ -60,7 +60,9 @@ public class tflGetBusTimesService extends Service {
     }
     @Override
     public void onDestroy(){
-
+        Log.d(TAG, "service destroy called");
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler = null;
         super.onDestroy();
     }
     @Override
