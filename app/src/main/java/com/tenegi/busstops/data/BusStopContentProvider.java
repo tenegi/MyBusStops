@@ -337,8 +337,8 @@ public class BusStopContentProvider extends ContentProvider {
                 + BusStopContract.BusStopEntry.TABLE_NAME
                 + " WHERE "
                 + BusStopContract.BusStopEntry.COLUMN_ROUTE
-                + " = " + str[0]
-                + " AND "
+                + " = '" + str[0]
+                + "' AND "
                 + BusStopContract.BusStopEntry.COLUMN_RUN
                 + " = " + str[1]
                 + " ORDER BY "
@@ -388,7 +388,7 @@ public class BusStopContentProvider extends ContentProvider {
                 + " = x." +BusStopContract.BusStopEntry.COLUMN_RUN
                 + " AND b." + BusStopContract.BusStopEntry.COLUMN_SEQUENCE
                 + " = x.seq) "
-                +" WHERE b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " LIKE '%" + filter + "%' "
+                +" WHERE b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " LIKE '" + filter + "%' "
                 + " ORDER BY CAST(b."+ BusStopContract.BusStopEntry.COLUMN_ROUTE + " as INTEGER) ,b."
                 + BusStopContract.BusStopEntry.COLUMN_RUN + ";";
         return searchQuery;

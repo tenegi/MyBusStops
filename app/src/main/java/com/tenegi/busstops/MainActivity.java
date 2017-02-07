@@ -13,14 +13,17 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +43,7 @@ import static com.tenegi.busstops.data.BusStopContract.PATH_FAVOURITES;
 import static com.tenegi.busstops.data.BusStopContract.PATH_SETTINGS;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+    private static final int VERTICAL_ITEM_SPACE = 28;
     private static final String TAG = "Main Activity";
     private static final int FAVOURITES_LOADER = 1;
     private static final int SETTINGS_LOADER = 2;
@@ -52,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private boolean NEED_ROUTES_REFRESH = false;
     private FavouriteListAdapter mAdapter;
     private TextView statusTextView;
-    private TextView settingsStatusTextView;
+
     RecyclerView favouriteRecyclerView;
     CursorLoader cursorLoader;
     Context mContext = this;
@@ -64,10 +68,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
 
         statusTextView = (TextView) findViewById(R.id.status);
-        settingsStatusTextView = (TextView) findViewById(R.id.settingsStatus);
-        //RecyclerView favouriteRecyclerView;
         favouriteRecyclerView = (RecyclerView) findViewById(R.id.favourites_list_view);
         favouriteRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        favouriteRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
+        favouriteRecyclerView.addItemDecoration(new com.tenegi.busstops.DividerItemDecoration(mContext));
         getSupportLoaderManager().initLoader(FAVOURITES_LOADER,null,this);
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -126,16 +130,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         sb.append("\n" + route + ", " + stopname);
                         cursor.moveToNext();
                     }
-                    statusTextView.setText(rows + " Favourites found" + sb);
+                    statusTextView.setVisibility(View.INVISIBLE);
                     cursor.moveToFirst();
                     mAdapter = new FavouriteListAdapter(this, cursor);
                     mAdapter.setOnItemClickListener(new FavouriteListAdapter.ClickListener() {
                         @Override
                         public void onItemClick(int position, View v) {
-                            String t = v.getTag().toString();
+                            long tagValue = (long) v.getTag();
+                            String t = String.valueOf(tagValue);
                             Log.d(TAG, "onItemClick position: " + position + ", tag = " + t);
-                            Toast.makeText(MainActivity.this, "Item Clicked " + t, Toast.LENGTH_LONG).show();
-
+                            //Toast.makeText(MainActivity.this, "Item Clicked " + t, Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(getApplicationContext(), TimesActivity.class);
+                            i.putExtra("STOPPOINT_URL",STOPPOINT_URL);
+                            i.putExtra("STOPPOINT_PATH",STOPPOINT_PATH);
+                            i.putExtra("STOPPOINT_APPID",STOPPOINT_APPID);
+                            i.putExtra("STOPPOINT_APPKEY",STOPPOINT_APPKEY);
+                            i.putExtra("id",tagValue);
+                            startActivity(i);
                         }
 
                         @Override
@@ -143,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             long tagValue = (long) v.getTag();
                             String t = String.valueOf(tagValue);
                             Log.d(TAG, "onItemLongClick position: " + position + ", tag = " + t);
-                            Toast.makeText(MainActivity.this, "Item Long Clicked " + t, Toast.LENGTH_LONG).show();
+                            //Toast.makeText(MainActivity.this, "Item Long Clicked " + t, Toast.LENGTH_LONG).show();
                             Intent i = new Intent(getApplicationContext(), TimesActivity.class);
                             i.putExtra("STOPPOINT_URL",STOPPOINT_URL);
                             i.putExtra("STOPPOINT_PATH",STOPPOINT_PATH);
@@ -181,12 +192,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 cal.setTime(d);
                 cal.add(Calendar.DAY_OF_YEAR, 7);
                 NEED_ROUTES_REFRESH = cal.before(today);
-                settingsStatusTextView.setText(NEED_ROUTES_REFRESH ? "need to refresh" : "routes up to date");
                 break;
 
         }
 
     }
+
     @Override
     public void onLoaderReset(Loader<Cursor> arg0){
 
@@ -196,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         super.onDestroy();
     }
-
     private void removeFavourite(long id){
         ContentValues busStopValues = new ContentValues();
         busStopValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 0);

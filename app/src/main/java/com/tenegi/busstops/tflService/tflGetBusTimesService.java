@@ -51,12 +51,14 @@ public class tflGetBusTimesService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
     private void scheduleNext() {
-        mHandler.postDelayed(new Runnable() {
-            public void run() {
-                myTask = new TheTask();
-                myTask.execute();
-            }
-        }, 60000);
+        if(mHandler != null) {
+            mHandler.postDelayed(new Runnable() {
+                public void run() {
+                    myTask = new TheTask();
+                    myTask.execute();
+                }
+            }, 60000);
+        }
     }
     @Override
     public void onDestroy(){

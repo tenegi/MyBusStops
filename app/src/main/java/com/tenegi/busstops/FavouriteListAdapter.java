@@ -49,11 +49,10 @@ public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdap
         long id = mCursor.getLong(mCursor.getColumnIndex(BusStopContract.BusStopEntry._ID));
         String route = mCursor.getString(mCursor.getColumnIndex(COLUMN_ROUTE));
         String stopname = mCursor.getString(mCursor.getColumnIndex(COLUMN_STOP_NAME));
-        int run = mCursor.getInt(mCursor.getColumnIndex(COLUMN_RUN));
+
 
         holder.routeNumberView.setText(route);
         holder.bustopNameView.setText(stopname);
-        holder.routeDirectionView.setText(String.valueOf(run));
         holder.itemView.setTag(id);
     }
 
@@ -65,14 +64,12 @@ public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdap
     class FavouriteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
         TextView routeNumberView;
-        TextView routeDirectionView;
         TextView bustopNameView;
 
         public FavouriteViewHolder(View itemView) {
 
             super(itemView);
             routeNumberView = (TextView) itemView.findViewById(R.id.route_number);
-            routeDirectionView = (TextView) itemView.findViewById(R.id.route_direction);
             bustopNameView = (TextView) itemView.findViewById(R.id.stop_name);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
