@@ -21,6 +21,7 @@ public class StopListAdapter extends RecyclerView.Adapter<StopListAdapter.StopVi
     private static ClickListener clickListener;
 
     public interface ClickListener {
+        void onItemClick(int position, View v);
         void onItemLongClick(int position, View v);
     }
 
@@ -55,7 +56,7 @@ public class StopListAdapter extends RecyclerView.Adapter<StopListAdapter.StopVi
         return mCursor.getCount();
     }
 
-    class StopViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
+    class StopViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         TextView stopNumberView;
         TextView bustopNameView;
 
@@ -64,6 +65,12 @@ public class StopListAdapter extends RecyclerView.Adapter<StopListAdapter.StopVi
             stopNumberView = (TextView) itemView.findViewById(R.id.stop_number);
             bustopNameView = (TextView) itemView.findViewById(R.id.stop_name);
             itemView.setOnLongClickListener(this);
+            itemView.setOnClickListener(this);
+        }
+        @Override
+        public void onClick(View v) {
+
+            clickListener.onItemClick(getAdapterPosition(), v);
         }
         @Override
         public boolean onLongClick(View v) {

@@ -81,6 +81,13 @@ public class StopsActivity extends AppCompatActivity implements LoaderManager.Lo
                             Toast.makeText(StopsActivity.this, "Added to favourites " + t, Toast.LENGTH_LONG).show();
                             addFavourite(Long.parseLong(t));
                         }
+                        @Override
+                        public void onItemClick(int position, View v) {
+                            String t = v.getTag().toString();
+                            Log.d(TAG, "onItemClick position: " + position + ", tag = " + t);
+                            Toast.makeText(StopsActivity.this, "Added to favourites " + t, Toast.LENGTH_LONG).show();
+                            addFavourite(Long.parseLong(t));
+                        }
                     });
                     stopsRecyclerView.setAdapter(mAdapter);
                 }
