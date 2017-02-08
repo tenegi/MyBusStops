@@ -9,6 +9,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.tenegi.busstops.BusTimeResult;
+import com.tenegi.busstops.BusTimeResultList;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -33,7 +36,7 @@ public class tflGetBusTimesService extends Service {
     private String URL_TO_CALL;
     TheTask myTask = null;
     Handler mHandler = new Handler();
-
+    String errMessage = "";
 
     @Override
     public void onCreate(){
@@ -73,39 +76,12 @@ public class tflGetBusTimesService extends Service {
     }
 
 
-    private ArrayList<String> getData(){
-        Log.d(TAG, "get data called");
-        Log.d(TAG, "url is " + URL_TO_CALL);
-        StringBuilder result = new StringBuilder();
-        ArrayList<String> timings = new ArrayList<String>();
-        try {
-            URL url = new URL(URL_TO_CALL);
-            String line;
-            URLConnection urlc = url.openConnection();
-            BufferedReader bfr=new BufferedReader(new InputStreamReader(urlc.getInputStream()));
-            while((line=bfr.readLine())!=null) {
-                result.append(line);
-            }
-            }catch(Exception e){
-            e.printStackTrace();
-        }
-        Log.d(TAG, "get data results = " + result);
-        try {
-            JSONArray jsa = new JSONArray(result);
-            for (int i = 0; i < jsa.length(); i++) {
-                JSONObject jo = (JSONObject) jsa.get(i);
-                timings.add(jo.getString("expectedArrival"));
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return timings;
-    }
     class TheTask extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... params) {
             Log.d(TAG, "get data called");
             Log.d(TAG, "url is " + URL_TO_CALL);
+            errMessage = "";
             StringBuilder result = new StringBuilder();
 
             try {
@@ -118,37 +94,57 @@ public class tflGetBusTimesService extends Service {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                errMessage = "http call failed " + e.getMessage();
             }
             return result.toString();
         }
 
         @Override
         protected void onPostExecute(String result) {
-            Log.d(TAG, "post execute  results = " + result);
-            ArrayList<String> timings = new ArrayList<String>();
-            try {
-                JSONArray jsa = new JSONArray(result);
-                for (int i = 0; i < jsa.length(); i++) {
-                    JSONObject jo = (JSONObject) jsa.get(i);
-                    String timeInfo = jo.getString("expectedArrival");
-                    Log.d(TAG, "have got " + timeInfo + " result ");
-                    timings.add(timeInfo);
+            Intent timesResults = new Intent();
+            timesResults.setAction(GET_TIMES_SERVICE_RESULTS);
+            Bundle mBundle = new Bundle();
+            if(errMessage == "") {
+                Log.d(TAG, "post execute  results = " + result);
+                //ArrayList<String> timings = new ArrayList<String>();
+                BusTimeResultList resultList = new BusTimeResultList();
+                try {
+                    JSONArray jsa = new JSONArray(result);
+                    for (int i = 0; i < jsa.length(); i++) {
+                        JSONObject jo = (JSONObject) jsa.get(i);
+                        String routeName = jo.getString("lineName");
+                        String arrivalTime = jo.getString("expectedArrival");
+                        int timeToStop = jo.getInt("timeToStation");
+                        String destination = jo.getString("destinationName");
+                        BusTimeResult b = new BusTimeResult(routeName, arrivalTime, timeToStop, destination);
+                        resultList.add(b);
+                        Log.d(TAG, "have got " + arrivalTime + " result ");
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    errMessage = "Failed parsing json " + e.getMessage();
                 }
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (timings.size() > 0) {
-                Log.d(TAG, "have got " + timings.size() + " results ");
 
-                Intent timesResults = new Intent();
-                timesResults.setAction(GET_TIMES_SERVICE_RESULTS);
-                Bundle mBundle = new Bundle();
-                mBundle.putStringArrayList("timings", timings);
-                //timesResults.putStringArrayListExtra("timings", (ArrayList<String>)timings);
-                timesResults.putExtras(mBundle);
-                sendBroadcast(timesResults);
+                int numResults = resultList.size();
+                Log.d(TAG, "have got " + numResults + " results ");
+                mBundle.putInt("numResults", numResults);
+                if(errMessage == "") {
+                    mBundle.putString("message", "OK");
+                }else{
+                    mBundle.putString("message", errMessage);
+                }
+                if (numResults > 0) {
+
+                    mBundle.putParcelable("timings", resultList);
+                    timesResults.putExtras(mBundle);
+                }
+            } else {
+                mBundle.putInt("numResults", 0);
+                mBundle.putString("message", errMessage);
             }
+            sendBroadcast(timesResults);
             scheduleNext();
         }
     }

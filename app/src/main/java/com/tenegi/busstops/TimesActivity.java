@@ -23,6 +23,8 @@ import com.tenegi.busstops.data.BusStopContract;
 import com.tenegi.busstops.tflService.tflGetBusTimesService;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
 import static com.tenegi.busstops.data.BusStopContract.PATH_BUSSTOPS;
@@ -64,10 +66,36 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Broadcast receiver has received");
-            //Intent i = getIntent();
-            //Bundle b = getIntent().getExtras();
             Bundle b = intent.getExtras();
             if(b != null) {
+                int numResults = b.getInt("numResults");
+                String message = b.getString("message");
+                if(numResults == 0){
+                    if(message != "OK") {
+                        mHdrView.setText(message);
+                    } else {
+                        mHdrView.setText("No bus times received from service");
+                    }
+                } else {
+                    BusTimeResultList resultList = b.getParcelable("timings");
+                    if(resultList != null) {
+                        Log.d(TAG, "Broadcast receiver results = " + resultList.size());
+
+                        Collections.sort(resultList, new Comparator<BusTimeResult>() {
+                            public int compare(BusTimeResult o1, BusTimeResult o2) {
+                                return Integer.compare(o1.getTimeToStop(),o2.getTimeToStop());
+                            }
+                        });
+                        BusTimesAdapter adapter = new BusTimesAdapter(TimesActivity.this, resultList);
+                        timesRecyclerView.setAdapter(adapter);
+                    }else {
+                        Log.d(TAG, "Broadcast receiver got bundle but not array list");
+                        String s = bundle2string(b);
+                        Log.d(TAG, "Broadcast receiver got bundle = " + s);
+                    }
+
+                }
+                /*
                 //ArrayList<String> results = i.getExtras().getStringArrayList("timings");
                 ArrayList<String> results = b.getStringArrayList("timings");
                 if(results != null){
@@ -79,7 +107,7 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
                     Log.d(TAG, "Broadcast receiver got bundle but not array list");
                     String s = bundle2string(b);
                     Log.d(TAG, "Broadcast receiver got bundle = " + s);
-                }
+                }*/
 
 
             } else {

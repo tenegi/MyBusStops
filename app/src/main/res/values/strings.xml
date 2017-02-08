@@ -2,6 +2,6 @@
     <string name="app_name">BusStops</string>
     <string name="action_routes">Routes</string>
     <string name="action_search">Search</string>
-    <string name="stops_header">Stops for route :</string>
+    <string name="stops_header">Stops for Route :</string>
     <string name="times_header">Next buses for :</string>
 </resources>
