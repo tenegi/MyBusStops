@@ -9,6 +9,7 @@ public class BusTimeResult{
     private String mExpectedArrival;
     private int mTimeToStop;
     private String mDestination;
+    private int mSelectedRoute;
     public BusTimeResult(){
     }
     public BusTimeResult(String route, String expectedArrival, int timeToStop, String destination) {
@@ -16,6 +17,7 @@ public class BusTimeResult{
         this.mExpectedArrival = expectedArrival;
         this.mTimeToStop = timeToStop;
         this.mDestination = destination;
+        this.mSelectedRoute = 0;
     }
     public void setRoute(String route){
         this.mRoute = route;
@@ -39,11 +41,17 @@ public class BusTimeResult{
         int t = (mTimeToStop + 59) / 60;
         return String.valueOf(t) + " minutes";
     }
-    public void setDestiniation(String destination){
+    public void setDestination(String destination){
         this.mDestination = destination;
     }
     public String getDestination(){
         return mDestination;
+    }
+    public void setSelectedRoute(int selected){
+        mSelectedRoute = selected;
+    }
+    public int getSelectedRoute(){
+        return mSelectedRoute;
     }
 
 

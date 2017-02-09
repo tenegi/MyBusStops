@@ -2,6 +2,7 @@ package com.tenegi.busstops;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,6 @@ import android.widget.TextView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -59,7 +59,13 @@ public class BusTimesAdapter extends BaseAdapter{
         arrivalTimeView.setText(arrTime);
         timeToStopView.setText(b.getTimeToStopInMinutes());
         destinationView.setText(b.getDestination());
-
+        if(b.getSelectedRoute() == 1) {
+            routeView.setBackgroundResource(R.drawable.blue_circle);
+            routeView.setTextColor(Color.WHITE);
+        } else{
+            routeView.setBackgroundResource(R.drawable.white_circle);
+            routeView.setTextColor(Color.BLACK);
+        }
         return v;
     }
     public int getCount(){

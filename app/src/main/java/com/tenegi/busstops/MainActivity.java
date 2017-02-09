@@ -165,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         public void onItemClick(int position, View v) {
                             long tagValue = (long) v.getTag();
                             String t = String.valueOf(tagValue);
+                            TextView routeView = (TextView) v.findViewById(R.id.route_number);
+                            String route = routeView.getText().toString();
                             Log.d(TAG, "onItemClick position: " + position + ", tag = " + t);
                             //Toast.makeText(MainActivity.this, "Item Clicked " + t, Toast.LENGTH_LONG).show();
                             Intent i = new Intent(getApplicationContext(), TimesActivity.class);
@@ -172,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             i.putExtra("STOPPOINT_PATH", STOPPOINT_PATH);
                             i.putExtra("STOPPOINT_APPID", STOPPOINT_APPID);
                             i.putExtra("STOPPOINT_APPKEY", STOPPOINT_APPKEY);
+                            i.putExtra("SELECTED_ROUTE", route);
                             i.putExtra("id", tagValue);
                             startActivity(i);
                         }

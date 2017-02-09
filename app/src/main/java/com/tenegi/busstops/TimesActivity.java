@@ -39,6 +39,7 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
     private String STOPPOINT_APPID = "";
     private String STOPPOINT_APPKEY = "";
     private String STOPPOINT_NAPTAN_ATCO = "";
+    private String selectedRoute ="";
     long stopId;
     CursorLoader cursorLoader;
 
@@ -54,11 +55,14 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
         //timesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         timesRecyclerView = (ListView) findViewById(R.id.times_list_view);
         mHdrView = (TextView) findViewById(R.id.times_hdr);
+
         STOPPOINT_URL = getIntent().getExtras().getString("STOPPOINT_URL");
         STOPPOINT_PATH = getIntent().getExtras().getString("STOPPOINT_PATH");
         STOPPOINT_APPID = getIntent().getExtras().getString("STOPPOINT_APPID");
         STOPPOINT_APPKEY = getIntent().getExtras().getString("STOPPOINT_APPKEY");
+        selectedRoute = getIntent().getExtras().getString("SELECTED_ROUTE");
         stopId = getIntent().getExtras().getLong("id");
+
         getSupportLoaderManager().initLoader(SETTINGS_LOADER,null,this);
 
     }
@@ -80,7 +84,13 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
                     BusTimeResultList resultList = b.getParcelable("timings");
                     if(resultList != null) {
                         Log.d(TAG, "Broadcast receiver results = " + resultList.size());
+                        for (BusTimeResult br: resultList){
 
+                            if(br.getRoute().equals(selectedRoute)) {
+                                br.setSelectedRoute(1);
+                                Log.d(TAG, "Set selected route item:" + br.getSelectedRoute() + " selected:" + selectedRoute);
+                            }
+                        }
                         Collections.sort(resultList, new Comparator<BusTimeResult>() {
                             public int compare(BusTimeResult o1, BusTimeResult o2) {
                                 return Integer.compare(o1.getTimeToStop(),o2.getTimeToStop());

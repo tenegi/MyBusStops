@@ -9,7 +9,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center"
-        android:background="@drawable/circle"
+        android:background="@drawable/blue_circle"
         android:fontFamily="sans-serif"
         android:gravity="center"
         android:textColor="@android:color/white"

@@ -255,7 +255,7 @@ public class tflService extends IntentService {
             String favRoute = value.get(BusStopContract.BusStopEntry.COLUMN_ROUTE).toString();
             int favRun = (int) value.get(BusStopContract.BusStopEntry.COLUMN_RUN);
             int favSeq = (int) value.get(BusStopContract.BusStopEntry.COLUMN_SEQUENCE);
-            if(favRoute == route && favRun == run && favSeq == sequence){
+            if(favRoute.equals(route) && favRun == run && favSeq == sequence){
                 return true;
             }
         }

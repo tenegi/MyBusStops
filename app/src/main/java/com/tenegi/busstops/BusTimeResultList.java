@@ -38,7 +38,8 @@ public class BusTimeResultList extends ArrayList<BusTimeResult> implements Parce
             b.setRoute(in.readString());
             b.setExpectedArival(in.readString());
             b.setTimeToStop(in.readInt());
-            b.setDestiniation(in.readString());
+            b.setDestination(in.readString());
+            b.setSelectedRoute((in.readInt()));
             this.add(b);
         }
     }
@@ -55,6 +56,7 @@ public class BusTimeResultList extends ArrayList<BusTimeResult> implements Parce
             dest.writeString(b.getExpectedArival());
             dest.writeInt(b.getTimeToStop());
             dest.writeString(b.getDestination());
+            dest.writeInt(b.getSelectedRoute());
         }
     }
 }
