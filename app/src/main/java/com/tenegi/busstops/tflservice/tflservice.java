@@ -55,7 +55,7 @@ public class tflService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent){
         String urlPath = intent.getStringExtra(REMOTEURL);
-        String fileName = intent.getStringExtra(FILENAME);
+        String fileName = "temp.csv";
         //File output = new File(Environment..getExternalStorageDirectory(), fileName);
         File output = new File(this.getFilesDir(), fileName);
         if(output.exists()){
@@ -117,18 +117,22 @@ public class tflService extends IntentService {
                 String[] str = line.split(",");
                 Log.d(TAG, "Fields in array = " + str.length);
                 if(str.length == 11) {
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_ROUTE, str[0]);
-                    busStopValues.put(COLUMN_RUN, str[1]);
-                    busStopValues.put(COLUMN_SEQUENCE, str[2]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_CODE_LBSL, str[3]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE, str[4]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO, str[5]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_NAME, str[6]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, str[7]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, str[8]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, str[9]);
-                    busStopValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 0);
-                    Uri uri = contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, busStopValues);
+                    if(!str[10].equals("1")) {
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_ROUTE, str[0]);
+                        busStopValues.put(COLUMN_RUN, str[1]);
+                        busStopValues.put(COLUMN_SEQUENCE, str[2]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_CODE_LBSL, str[3]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE, str[4]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO, str[5]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_STOP_NAME, str[6]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_EASTING, str[7]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_LOCATION_NORTHING, str[8]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_HEADING, str[9]);
+                        busStopValues.put(BusStopContract.BusStopEntry.COLUMN_FAVOURITE, 0);
+                        Uri uri = contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, busStopValues);
+                    } else {
+                        Log.d(TAG, "skipping virtual bus stop " + line);
+                    }
                 } else {
                      Log.d(TAG, "skipping malformed line " + line);
                 }
@@ -163,24 +167,28 @@ public class tflService extends IntentService {
                 ContentValues busStopValues = new ContentValues();
                 String[] str = line.split(",");
                 if(str.length == 11) {
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_ROUTE, str[0]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_RUN, str[1]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_SEQUENCE, str[2]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_STOP_CODE_LBSL, str[3]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_BUS_STOP_CODE, str[4]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_NAPTAN_ATCO, str[5]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_STOP_NAME, str[6]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_LOCATION_EASTING, str[7]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_LOCATION_NORTHING, str[8]);
-                    busStopValues.put(BusStopContract.LoadEntry.COLUMN_HEADING, str[9]);
-                    if(isFavourite(str[0], Integer.parseInt(str[1]), Integer.parseInt(str[2]), favourites)) {
-                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_FAVOURITE, 1);
-                    } else {
-                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_FAVOURITE, 0);
+                    if(!str[10].equals("1")) {
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_ROUTE, str[0]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_RUN, str[1]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_SEQUENCE, str[2]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_STOP_CODE_LBSL, str[3]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_BUS_STOP_CODE, str[4]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_NAPTAN_ATCO, str[5]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_STOP_NAME, str[6]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_LOCATION_EASTING, str[7]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_LOCATION_NORTHING, str[8]);
+                        busStopValues.put(BusStopContract.LoadEntry.COLUMN_HEADING, str[9]);
+                        if (isFavourite(str[0], Integer.parseInt(str[1]), Integer.parseInt(str[2]), favourites)) {
+                            busStopValues.put(BusStopContract.LoadEntry.COLUMN_FAVOURITE, 1);
+                        } else {
+                            busStopValues.put(BusStopContract.LoadEntry.COLUMN_FAVOURITE, 0);
+                        }
+                        //Uri uri = contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, busStopValues);
+                        //thisBatch ++;
+                        linesToInsert[thisBatch++] = busStopValues;
+                    }else {
+                        Log.d(TAG, "skipping virtual bus stop " + line);
                     }
-                    //Uri uri = contentResolver.insert(BusStopContract.BusStopEntry.CONTENT_URI, busStopValues);
-                    //thisBatch ++;
-                    linesToInsert[thisBatch++] = busStopValues;
                 } else {
                     Log.d(TAG, "skipping malformed line " + line);
                 }

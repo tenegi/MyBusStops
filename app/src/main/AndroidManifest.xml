@@ -26,8 +26,18 @@
             android:authorities="com.tenegi.busstops"
             android:exported="false" />
 
-        <activity android:name=".RoutesActivity" />
-        <activity android:name=".StopsActivity" />
+        <activity android:name=".RoutesActivity"
+            android:parentActivityName=".MainActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity" />
+        </activity>
+        <activity android:name=".StopsActivity"
+            android:parentActivityName=".RoutesActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".RoutesActivity" />
+        </activity>
         <activity android:name=".TimesActivity"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data

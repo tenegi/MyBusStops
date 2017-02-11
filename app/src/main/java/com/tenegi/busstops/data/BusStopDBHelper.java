@@ -18,7 +18,7 @@ import java.util.Locale;
 public class BusStopDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "busstops.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 1;
 
     public BusStopDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -99,7 +99,7 @@ public class BusStopDBHelper extends SQLiteOpenHelper {
     private void seedDatabase(SQLiteDatabase sqLiteDatabase){
         ContentValues value = new ContentValues();
         value.put(SettingsEntry.COLUMN_ROUTES_URL,
-                "https://www.tfl.gov.uk/tfl/businessandpartners/syndication/feed.aspx?email=lyndon@tenegi.com&feedId=10");
+                "https://www.tfl.gov.uk/tfl/businessandpartners/syndication/feed.aspx?email=lyndon@tenegi.com&feedId=11");
         value.put(SettingsEntry.COLUMN_STOPPOINT_URL,
                 "https://api.tfl.gov.uk/StopPoint/");
         value.put(SettingsEntry.COLUMN_STOPPOINT_PATH,

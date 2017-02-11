@@ -8,10 +8,13 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +40,7 @@ public class StopsActivity extends AppCompatActivity implements LoaderManager.Lo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stops);
+        ActionBar actionBar = this.getSupportActionBar();
         route = getIntent().getExtras().getString("route");
         Bundle routeBundle = new Bundle();
         routeBundle.putString("route", route);
@@ -45,6 +49,9 @@ public class StopsActivity extends AppCompatActivity implements LoaderManager.Lo
         mRouteNumberView = (TextView) findViewById(R.id.routeNumber);
         mRouteNumberView.setText(route);
         getSupportLoaderManager().initLoader(STOPS_LOADER,routeBundle,this);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
     @Override
     public Loader<Cursor> onCreateLoader(int arg0, Bundle params){
@@ -97,6 +104,17 @@ public class StopsActivity extends AppCompatActivity implements LoaderManager.Lo
     @Override
     public void onLoaderReset(Loader<Cursor> arg0){
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        // When the home button is pressed, take the user back to the VisualizerActivity
+        if (id == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
+            //finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
     private void addFavourite(long id){
         ContentValues busStopValues = new ContentValues();

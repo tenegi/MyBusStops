@@ -12,11 +12,13 @@ import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +48,7 @@ import java.util.Date;
 import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_ROUTE;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
+import static com.tenegi.busstops.data.BusStopContract.PATH_BUSSTOP;
 import static com.tenegi.busstops.data.BusStopContract.PATH_FAVOURITES;
 import static com.tenegi.busstops.data.BusStopContract.PATH_SETTINGS;
 
@@ -60,15 +63,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String TAG = "Main Activity";
     private static final int FAVOURITES_LOADER = 1;
     private static final int SETTINGS_LOADER = 2;
+    private static final int SEARCHED_STOP_LOADER = 3;
     private String ROUTES_URL = "";
     private String STOPPOINT_URL = "";
     private String STOPPOINT_PATH = "";
     private String STOPPOINT_APPID = "";
     private String STOPPOINT_APPKEY = "";
-    private Date DATE_LAST_UPDATED;
+    private String DATE_LAST_UPDATED;
     private boolean NEED_ROUTES_REFRESH = false;
     private FavouriteListAdapter mAdapter;
     private TextView statusTextView;
+    private TextView searchStatusTextView;
 
     RecyclerView favouriteRecyclerView;
     CursorLoader cursorLoader;
@@ -87,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ProviderInstaller.installIfNeededAsync(this, this);
 
         statusTextView = (TextView) findViewById(R.id.status);
+        searchStatusTextView = (TextView) findViewById(R.id.main_search_status);
+        searchStatusTextView.setVisibility(View.INVISIBLE);
         favouriteRecyclerView = (RecyclerView) findViewById(R.id.favourites_list_view);
         favouriteRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         favouriteRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
@@ -112,13 +119,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    public void onClick(View view) {
+    //public void onClick(View view) {
 
-        getSupportLoaderManager().initLoader(FAVOURITES_LOADER, null, this);
-    }
+//        getSupportLoaderManager().initLoader(FAVOURITES_LOADER, null, this);
+  //  }
 
     public void restartLoader(int loader) {
-
         getSupportLoaderManager().initLoader(loader, null, this);
     }
 
@@ -131,6 +137,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 break;
             case FAVOURITES_LOADER:
                 CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVOURITES).build();
+                break;
+            case SEARCHED_STOP_LOADER:
+                CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_BUSSTOP).appendPath(arg1.getString("stopcode")).build();
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown loader id " + arg0);
@@ -148,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (rows == 0) {
                     statusTextView.setText("No Favourites found");
                 } else {
+                    Log.d(TAG, "found favourites count: " + String.valueOf(rows));
                     cursor.moveToFirst();
                     StringBuilder sb = new StringBuilder();
                     while (!cursor.isAfterLast()) {
@@ -216,12 +226,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                DATE_LAST_UPDATED = d;
+                DATE_LAST_UPDATED = s;
                 Calendar today = Calendar.getInstance();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(d);
                 cal.add(Calendar.DAY_OF_YEAR, 7);
                 NEED_ROUTES_REFRESH = cal.before(today);
+                break;
+            case SEARCHED_STOP_LOADER:
+                int stopRows = cursor.getCount();
+                Log.d(TAG, stopRows + " stop rows found");
+                if(stopRows > 0) {
+                    cursor.moveToFirst();
+                    long id = cursor.getLong(cursor.getColumnIndex(BusStopContract.BusStopEntry._ID));
+                    Intent i = new Intent(getApplicationContext(), TimesActivity.class);
+                    i.putExtra("STOPPOINT_URL", STOPPOINT_URL);
+                    i.putExtra("STOPPOINT_PATH", STOPPOINT_PATH);
+                    i.putExtra("STOPPOINT_APPID", STOPPOINT_APPID);
+                    i.putExtra("STOPPOINT_APPKEY", STOPPOINT_APPKEY);
+                    i.putExtra("SELECTED_ROUTE", "");
+                    i.putExtra("id", id);
+                    startActivity(i);
+                } else {
+                    searchStatusTextView.setVisibility(View.VISIBLE);
+                    searchStatusTextView.setText(R.string.main_stop_not_found);
+                }
                 break;
 
         }
@@ -253,6 +282,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_menu, menu);
+        final MenuItem searchItem = menu.findItem(R.id.main_action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                searchView.clearFocus();
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                showTimesForStop(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (searchView.getQuery().length() == 0) {
+                    //queryText = "";
+                    //restartLoader(ROUTES_LOADER);
+                }
+                return false;
+            }
+        });
         return true;
     }
 
@@ -261,14 +313,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int id = item.getItemId();
         if (id == R.id.action_routes) {
             Intent startRoutesActivity = new Intent(this, RoutesActivity.class);
-
+            startRoutesActivity.putExtra("route_url", ROUTES_URL);
+            startRoutesActivity.putExtra("need_to_update",NEED_ROUTES_REFRESH);
+            startRoutesActivity.putExtra("last_update", DATE_LAST_UPDATED);
             startActivity(startRoutesActivity);
 
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+    private void showTimesForStop(String stopCode){
+        Bundle b = new Bundle();
+        b.putString("stopcode", stopCode);
+        getSupportLoaderManager().initLoader(SEARCHED_STOP_LOADER, b, this);
 
+    }
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.

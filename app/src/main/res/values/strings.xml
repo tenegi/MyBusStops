@@ -1,7 +1,17 @@
 <resources>
-    <string name="app_name">BusStops</string>
+    <string name="app_name">My Bus Stops</string>
+    <string name="main_stop_not_found">Stop not found</string>
+    <string name="main_stop_found">Stop %1$s added</string>
     <string name="action_routes">Routes</string>
     <string name="action_search">Search</string>
+    <string name="action_update">Update</string>
     <string name="stops_header">Stops for Route :</string>
     <string name="times_header">Next buses for :</string>
+    <string name="routes_service_started">Update service called</string>
+    <string name="routes_no_routes">No routes found</string>
+    <string name="routes_status_updated">Routes updated on %1$s </string>
+    <string name="routes_update_needed">Routes updated on %1$s update needed.</string>
+    <string name="routes_status_dl_complete">Update Completed</string>
+    <string name="routes_status_dl_complete_with_uri">Update Completed URI: </string>
+    <string name="routes_status_dl_failed">Update Failed</string>
 </resources>

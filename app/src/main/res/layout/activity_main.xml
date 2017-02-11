@@ -17,6 +17,13 @@
             android:fontFamily="sans-serif"
             android:textSize="16sp"
             android:text="" />
+        <TextView
+            android:id="@+id/main_search_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textSize="16sp"
+            android:text="" />
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/favourites_list_view"

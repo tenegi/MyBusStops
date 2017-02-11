@@ -19,6 +19,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import static android.provider.BaseColumns._ID;
+import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_FAVOURITE;
 import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.TABLE_NAME;
 
@@ -32,6 +33,7 @@ public class BusStopContentProvider extends ContentProvider {
     public static final int BUSSTOPS = 100;
     public static final int BUSSTOPS_WITH_ID = 101;
     public static final int BUSSTOPS_WITH_ROUTE_AND_RUN = 102;
+    public static final int BUSSTOP = 103;
     public static final int BUSROUTES = 200;
     public static final int BUSROUTE_WITH_ID = 201;
     public static final int FAVOURITES = 300;
@@ -54,6 +56,7 @@ public class BusStopContentProvider extends ContentProvider {
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS, BUSSTOPS);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS + "/#", BUSSTOPS_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOPS + "/*", BUSSTOPS_WITH_ROUTE_AND_RUN);
+        uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSSTOP + "/#", BUSSTOP);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES, BUSROUTES);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_BUSROUTES + "/*", BUSROUTE_WITH_ID);
         uriMatcher.addURI(BusStopContract.AUTHORITY, BusStopContract.PATH_FAVOURITES, FAVOURITES);
@@ -243,6 +246,11 @@ public class BusStopContentProvider extends ContentProvider {
                         sortOrder);
 
                 break;
+            case BUSSTOP:
+                String busStopQuery = getSqlForOneStopByStopCode(uri.getLastPathSegment());
+                Log.d("ContentProvider", "query by stop code =  " + busStopQuery);
+                retCursor = db.rawQuery(busStopQuery, null);
+                break;
             // Default exception
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -311,6 +319,7 @@ public class BusStopContentProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 break;
+
             // COMPLETED (4) Set the value for the returnedUri and write the default case for unknown URI's
             // Default case throws an UnsupportedOperationException
             default:
@@ -403,6 +412,18 @@ public class BusStopContentProvider extends ContentProvider {
                 +" WHERE "+ BusStopContract.BusStopEntry._ID
                 + " = " + filter
                 + ";";
+        return searchQuery;
+    }
+    private String getSqlForOneStopByStopCode(String filter){
+        String searchQuery = "SELECT "
+                + BusStopContract.BusStopEntry._ID
+                + ", "
+                + BusStopContract.BusStopEntry.COLUMN_NAPTAN_ATCO
+                + " FROM "
+                + BusStopContract.BusStopEntry.TABLE_NAME
+                +" WHERE "+ BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE
+                + " = '" + filter
+                + "';";
         return searchQuery;
     }
 
