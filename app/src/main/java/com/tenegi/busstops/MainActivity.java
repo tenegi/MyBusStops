@@ -285,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         final MenuItem searchItem = menu.findItem(R.id.main_action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
+        searchView.setQueryHint(getResources().getString(R.string.main_search_hint));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

@@ -194,7 +194,7 @@ public class RoutesActivity extends AppCompatActivity implements LoaderManager.L
         inflater.inflate(R.menu.route_activity_menu, menu);
         final MenuItem searchItem = menu.findItem(R.id.route_action_search);
         mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-
+        mSearchView.setQueryHint(getResources().getString(R.string.routes_search_hint));
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

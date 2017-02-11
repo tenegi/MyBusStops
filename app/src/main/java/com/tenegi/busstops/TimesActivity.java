@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -105,19 +107,6 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
                     }
 
                 }
-                /*
-                //ArrayList<String> results = i.getExtras().getStringArrayList("timings");
-                ArrayList<String> results = b.getStringArrayList("timings");
-                if(results != null){
-                    Log.d(TAG, "Broadcast receiver results = " + results.size());
-
-                    BusTimesAdapter adapter = new BusTimesAdapter(TimesActivity.this, results);
-                    timesRecyclerView.setAdapter(adapter);
-                }else {
-                    Log.d(TAG, "Broadcast receiver got bundle but not array list");
-                    String s = bundle2string(b);
-                    Log.d(TAG, "Broadcast receiver got bundle = " + s);
-                }*/
 
 
             } else {
@@ -163,6 +152,17 @@ public class TimesActivity extends AppCompatActivity implements LoaderManager.Lo
                 }
                 break;
         }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        // When the home button is pressed, take the user back to the Main page
+        if (id == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
+            //finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
     @Override
     public void onLoaderReset(Loader<Cursor> arg0){

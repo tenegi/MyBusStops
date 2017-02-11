@@ -2,11 +2,13 @@
     <string name="app_name">My Bus Stops</string>
     <string name="main_stop_not_found">Stop not found</string>
     <string name="main_stop_found">Stop %1$s added</string>
+    <string name="main_search_hint">Search for a bus stop code</string>
     <string name="action_routes">Routes</string>
     <string name="action_search">Search</string>
     <string name="action_update">Update</string>
     <string name="stops_header">Stops for Route :</string>
     <string name="times_header">Next buses for :</string>
+    <string name="routes_search_hint">Search for a bus route</string>
     <string name="routes_service_started">Update service called</string>
     <string name="routes_no_routes">No routes found</string>
     <string name="routes_status_updated">Routes updated on %1$s </string>
