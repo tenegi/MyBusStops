@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dip">
+    <TextView
+        android:id="@+id/tfl_credit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dip"
+        android:textSize="16sp"
+        android:text="@string/tfl_credit"
+        android:autoLink="web"
+         />
+    <TextView
+        android:id="@+id/os_credit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dip"
+        android:textSize="16sp"
+        android:text="@string/os_credit"
+        android:autoLink="web"
+         />
+
+
+</LinearLayout>

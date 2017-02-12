@@ -10,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -313,6 +314,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             return true;
         }
+        if(id == R.id.action_main_about){
+            showAbout();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
     private void showTimesForStop(String stopCode){
@@ -338,6 +343,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 .build();
     }
 */
+    protected void showAbout(){
+        View aboutView = getLayoutInflater().inflate(R.layout.about_dialog, null, false);
+        //TextView tflCredit = (TextView) aboutView.findViewById(R.id.tfl_credit);
+        //TextView osCredit = (TextView) aboutView.findViewById(R.id.os_credit);
+        //int defaultColor = tflCredit.getTextColors().getDefaultColor();
+        //tflCredit.setTextColor(defaultColor);
+        //osCredit.setTextColor(defaultColor);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //builder.setIcon(R.drawable.app_icon);
+        builder.setTitle(R.string.app_name);
+        builder.setView(aboutView);
+        builder.setPositiveButton("OK",null);
+        builder.create();
+        builder.show();
+
+    }
     @Override
     public void onStart() {
         super.onStart();
