@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //osCredit.setTextColor(defaultColor);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        //builder.setIcon(R.drawable.app_icon);
+        builder.setIcon(R.drawable.new_bus_logo);
         builder.setTitle(R.string.app_name);
         builder.setView(aboutView);
         builder.setPositiveButton("OK",null);
