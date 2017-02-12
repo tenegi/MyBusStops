@@ -12,24 +12,19 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tenegi.busstops.data.BusStopContract;
+import com.tenegi.busstops.dal.BusStopContract;
 import com.tenegi.busstops.tflService.tflGetBusTimesService;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
-import static com.tenegi.busstops.data.BusStopContract.PATH_BUSSTOPS;
+import static com.tenegi.busstops.dal.BusStopContract.BASE_CONTENT_URI;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_BUSSTOPS;
 
 public class TimesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 

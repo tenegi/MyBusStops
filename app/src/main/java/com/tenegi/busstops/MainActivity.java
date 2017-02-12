@@ -1,12 +1,9 @@
 package com.tenegi.busstops;
 
-import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
@@ -15,46 +12,41 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.security.ProviderInstaller;
-import com.tenegi.busstops.data.BusStopContract;
-import com.tenegi.busstops.tflService.tflService;
+//import com.google.android.gms.appindexing.Action;
+//import com.google.android.gms.appindexing.AppIndex;
+//import com.google.android.gms.appindexing.Thing;
+//import com.google.android.gms.common.GooglePlayServicesUtil;
+//import com.google.android.gms.common.api.GoogleApiClient;
+//import com.google.android.gms.security.ProviderInstaller;
+import com.tenegi.busstops.dal.BusStopContract;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_ROUTE;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
-import static com.tenegi.busstops.data.BusStopContract.PATH_BUSSTOP;
-import static com.tenegi.busstops.data.BusStopContract.PATH_FAVOURITES;
-import static com.tenegi.busstops.data.BusStopContract.PATH_SETTINGS;
-
+import static com.tenegi.busstops.dal.BusStopContract.BASE_CONTENT_URI;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_ROUTE;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_BUSSTOP;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_FAVOURITES;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_SETTINGS;
+/*
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         ProviderInstaller.ProviderInstallListener{
-
+*/
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
     private static final int ERROR_DIALOG_REQUEST_CODE = 1;
 
     private boolean mRetryProviderInstall;
@@ -82,14 +74,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-    private GoogleApiClient client;
+    //private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportLoaderManager().initLoader(SETTINGS_LOADER, null, this);
         setContentView(R.layout.activity_main);
-        ProviderInstaller.installIfNeededAsync(this, this);
+        //ProviderInstaller.installIfNeededAsync(this, this);
 
         statusTextView = (TextView) findViewById(R.id.status);
         searchStatusTextView = (TextView) findViewById(R.id.main_search_status);
@@ -116,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     //public void onClick(View view) {
@@ -333,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
+    /*
     public Action getIndexApiAction() {
         Thing object = new Thing.Builder()
                 .setName("Main Page") // TODO: Define a title for the content shown.
@@ -344,15 +337,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 .setActionStatus(Action.STATUS_TYPE_COMPLETED)
                 .build();
     }
-
+*/
     @Override
     public void onStart() {
         super.onStart();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+        //client.connect();
+        //AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     @Override
@@ -361,22 +354,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
+        //AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        //client.disconnect();
     }
     /**
      * This method is only called if the provider is successfully updated
      * (or is already up-to-date).
      */
+    /*
     @Override
     public void onProviderInstalled() {
         // Provider is up-to-date, app can make secure network calls.
     }
-
+*/
     /**
      * This method is called if updating fails; the error code indicates
      * whether the error is recoverable.
      */
+    /*
     @Override
     public  void onProviderInstallFailed(int errorCode, Intent recoveryIntent) {
         if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
@@ -398,7 +393,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             onProviderInstallerNotAvailable();
         }
     }
-
+    */
+/*
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
@@ -411,9 +407,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mRetryProviderInstall = true;
         }
     }
+    */
+    /*
     private void onProviderInstallerNotAvailable() {
         // This is reached if the provider cannot be updated for some reason.
         // App should consider all HTTP communication to be vulnerable, and take
         // appropriate action.
     }
+    */
 }

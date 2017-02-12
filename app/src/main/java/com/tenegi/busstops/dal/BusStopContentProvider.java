@@ -1,4 +1,4 @@
-package com.tenegi.busstops.data;
+package com.tenegi.busstops.dal;
 
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
@@ -19,9 +19,8 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import static android.provider.BaseColumns._ID;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_BUS_STOP_CODE;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_FAVOURITE;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.TABLE_NAME;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_FAVOURITE;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.TABLE_NAME;
 
 /**
  * Created by lyndon on 29/01/2017.

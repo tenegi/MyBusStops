@@ -19,11 +19,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tenegi.busstops.data.BusStopContract;
+import com.tenegi.busstops.dal.BusStopContract;
 
-import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
-import static com.tenegi.busstops.data.BusStopContract.PATH_BUSSTOPS;
-import static com.tenegi.busstops.data.BusStopContract.PATH_FAVOURITES;
+import static com.tenegi.busstops.dal.BusStopContract.BASE_CONTENT_URI;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_BUSSTOPS;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_FAVOURITES;
 
 public class StopsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 

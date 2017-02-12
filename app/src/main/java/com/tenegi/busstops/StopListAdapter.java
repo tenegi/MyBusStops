@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tenegi.busstops.data.BusStopContract.*;
+import com.tenegi.busstops.dal.BusStopContract.*;
 
 /**
  * Created by lyndon on 05/02/2017.

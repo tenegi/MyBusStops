@@ -1,10 +1,10 @@
-package com.tenegi.busstops.data;
+package com.tenegi.busstops.dal;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.tenegi.busstops.data.BusStopContract.*;
+import com.tenegi.busstops.dal.BusStopContract.*;
 
 
 import java.text.SimpleDateFormat;
@@ -18,7 +18,7 @@ import java.util.Locale;
 public class BusStopDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "busstops.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 5;
 
     public BusStopDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,6 +42,9 @@ public class BusStopDBHelper extends SQLiteOpenHelper {
                 createSettingsTable(sqLiteDatabase);
                 break;
             case 4:
+                sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SettingsEntry.TABLE_NAME);
+                createSettingsTable(sqLiteDatabase);
+            case 5:
                 sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SettingsEntry.TABLE_NAME);
                 createSettingsTable(sqLiteDatabase);
         }

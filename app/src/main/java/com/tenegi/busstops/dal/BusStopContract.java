@@ -1,10 +1,8 @@
-package com.tenegi.busstops.data;
+package com.tenegi.busstops.dal;
 
 
 import android.net.Uri;
 import android.provider.BaseColumns;
-
-import java.sql.Date;
 
 /**
  * Created by lyndon on 29/01/2017.

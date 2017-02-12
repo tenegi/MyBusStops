@@ -18,9 +18,9 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.tenegi.busstops.TestUtils.TestUtilities;
-import com.tenegi.busstops.data.BusStopContentProvider;
-import com.tenegi.busstops.data.BusStopContract;
-import com.tenegi.busstops.data.BusStopDBHelper;
+import com.tenegi.busstops.dal.BusStopContentProvider;
+import com.tenegi.busstops.dal.BusStopContract;
+import com.tenegi.busstops.dal.BusStopDBHelper;
 
 import org.junit.Before;
 import org.junit.Test;

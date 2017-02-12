@@ -2,7 +2,7 @@ package com.tenegi.busstops;
 
 import android.provider.BaseColumns;
 
-import com.tenegi.busstops.data.BusStopContract;
+import com.tenegi.busstops.dal.BusStopContract;
 
 import org.junit.Test;
 

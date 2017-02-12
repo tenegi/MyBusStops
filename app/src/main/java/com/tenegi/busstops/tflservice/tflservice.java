@@ -2,21 +2,16 @@ package com.tenegi.busstops.tflService;
 
 import android.app.Activity;
 import android.app.IntentService;
-import android.content.ContentProvider;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 
-import com.tenegi.busstops.data.BusStopContentProvider;
-import com.tenegi.busstops.data.BusStopContract;
-import com.tenegi.busstops.data.BusStopDBHelper;
+import com.tenegi.busstops.dal.BusStopContract;
+import com.tenegi.busstops.dal.BusStopDBHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,16 +21,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
-import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_ROUTE;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_RUN;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_SEQUENCE;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
-import static com.tenegi.busstops.data.BusStopContract.PATH_FAVOURITES;
-import static com.tenegi.busstops.data.BusStopContract.PATH_LOADER_TABLE;
+import static com.tenegi.busstops.dal.BusStopContract.BASE_CONTENT_URI;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_ROUTE;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_RUN;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_SEQUENCE;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_FAVOURITES;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_LOADER_TABLE;
 
 /**
  * Created by lyndon on 29/01/2017.
@@ -102,6 +95,7 @@ public class tflService extends IntentService {
         intent.putExtra(RESULT, result);
         sendBroadcast(intent);
     }
+    /*
     private void updateDatabase(String outputPath){
         try {
             FileReader file = new FileReader(outputPath);
@@ -142,6 +136,7 @@ public class tflService extends IntentService {
         e.printStackTrace();
         }
     }
+    */
     private void updateDatabaseBatch(String outputPath){
         try {
             ContentResolver contentResolver = this.getContentResolver();
@@ -153,6 +148,7 @@ public class tflService extends IntentService {
             BufferedReader buffer = new BufferedReader(file);
             String line = "";
             int linesRead =0;
+            int linesSkipped = 0;
             final int batchSize =1000;
             int thisBatch = 0;
             int insertCount = 0;
@@ -190,7 +186,8 @@ public class tflService extends IntentService {
                         Log.d(TAG, "skipping virtual bus stop " + line);
                     }
                 } else {
-                    Log.d(TAG, "skipping malformed line " + line);
+                    //Log.d(TAG, "skipping malformed line " + line);
+                    linesSkipped++;
                 }
                 //linesToInsert[thisBatch++] = busStopValues;
                 if(thisBatch == batchSize){
@@ -201,6 +198,10 @@ public class tflService extends IntentService {
                     Log.d(TAG, "batch inserted " + insertCount);
                 }
             }
+            if(linesToInsert.length > 0) {
+                insertCount = contentResolver.bulkInsert(BusStopContract.LoadEntry.CONTENT_URI, linesToInsert);
+            }
+            Log.d(TAG,"lines read = " + linesRead + " lines skipped =" + linesSkipped);
             if(linesRead > 0){
 
                 BusStopDBHelper mBusStopDbHelper = new BusStopDBHelper(this);
@@ -224,6 +225,7 @@ public class tflService extends IntentService {
             e.printStackTrace();
         }
     }
+
     private ContentValues[] getFavourites(ContentResolver contentResolver){
 
         Uri CONTENT_URI =

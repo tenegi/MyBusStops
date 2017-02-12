@@ -7,13 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tenegi.busstops.data.BusStopContract;
-
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_ROUTE;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_RUN;
-import static com.tenegi.busstops.data.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_ROUTE;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_RUN;
+import static com.tenegi.busstops.dal.BusStopContract.BusStopEntry.COLUMN_STOP_NAME;
 
 /**
  * Created by lyndon on 04/02/2017.

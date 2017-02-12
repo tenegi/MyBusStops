@@ -29,11 +29,8 @@ import android.widget.Toast;
 
 import com.tenegi.busstops.tflService.tflService;
 
-import java.util.Date;
-
-import static com.tenegi.busstops.data.BusStopContract.BASE_CONTENT_URI;
-import static com.tenegi.busstops.data.BusStopContract.PATH_BUSROUTES;
-import static java.security.AccessController.getContext;
+import static com.tenegi.busstops.dal.BusStopContract.BASE_CONTENT_URI;
+import static com.tenegi.busstops.dal.BusStopContract.PATH_BUSROUTES;
 
 public class RoutesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
     private static final String TAG = "Routes Activity";
